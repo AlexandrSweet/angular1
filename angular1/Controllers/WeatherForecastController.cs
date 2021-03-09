@@ -46,8 +46,7 @@ namespace angular1.Controllers
         public Settings GetSettings()
         {
             var settings = new Settings();
-            _configuration.Bind(settings);
-            var charcker = settings;
+            _configuration.Bind(settings);            
             return settings;
         }
     }
