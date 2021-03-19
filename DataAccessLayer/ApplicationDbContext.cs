@@ -6,9 +6,12 @@ using System.Text;
 
 namespace DataAccessLayer
 {
-    class ApplicationDbContext : DbContext, IApplicationDbContext
+    public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
+        {
+
+        }
         public DbSet<User> Users { get; set; }
     }
 }

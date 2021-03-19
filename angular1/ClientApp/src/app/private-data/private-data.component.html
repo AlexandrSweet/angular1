@@ -1,6 +1,6 @@
 <div *ngIf="privateDataset">
   <h1>private dataset retrieved:</h1>
-  <p *ngFor="let data of privateDataset">
-  {{data}}
+  <p *ngFor="let user of privateDataset">
+  <span>FirstName: <strong>{{user.firstName}}</strong>LastName: <strong> {{user.lastName}}</strong></span>     
   </p>
 </div>

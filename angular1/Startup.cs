@@ -9,13 +9,17 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
+using BusinessLayer.UserService;
+using System.Linq;
+using DataAccessLayer.Entities;
 
 namespace angular1
 {
     public class Startup
     {
         private object opt;
-
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = new ConfigurationBuilder().AddJsonFile($"appsettings.{environment.EnvironmentName}.json").Build();
@@ -26,6 +30,11 @@ namespace angular1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext> (option=>
+            {
+                option.UseSqlServer(Configuration["SqlServerConnectionString"],
+                    b => b.MigrationsAssembly("DataAccessLayer"));
+            });
             services.AddAuthentication(opt =>
             {
                   opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,7 +50,10 @@ namespace angular1
                        ValidAudience = "https://localhost:44331",
                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@123"))
                    };
-            });           
+            });
+
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<IUserService, UserService>();
           
            
             services.AddControllersWithViews();
@@ -76,6 +88,7 @@ namespace angular1
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            SeeddefauitUsers(app);
 
             app.UseEndpoints(endpoints =>
             {
@@ -96,6 +109,28 @@ namespace angular1
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+        private void SeeddefauitUsers(IApplicationBuilder app)
+        {
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using(var scope = scopeFactory.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                if (dbContext.Users.FirstOrDefault(u => u.FirstName == "Denis") == null)
+                {
+                    User Denis = new User { FirstName = "Denis", LastName = "Ivanov" };
+                    User Denis2 = new User { FirstName = "Denis2", LastName = "Ivanov2" };
+                    User Denis3 = new User { FirstName = "Denis3", LastName = "Ivanov3" };
+                    User Denis4 = new User { FirstName = "Denis4", LastName = "Ivanov4" };
+                    User Denis5 = new User { FirstName = "Denis5", LastName = "Ivanov5" };
+                    dbContext.Users.Add(Denis);
+                    dbContext.Users.Add(Denis2);
+                    dbContext.Users.Add(Denis3);
+                    dbContext.Users.Add(Denis4);
+                    dbContext.Users.Add(Denis5);
+                    dbContext.SaveChanges();
+                }
+            }
         }
     }
 }
