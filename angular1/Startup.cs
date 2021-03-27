@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using BusinessLayer.UserService;
 using System.Linq;
 using DataAccessLayer.Entities;
+using Microsoft.OpenApi.Models;
 
 namespace angular1
 {
@@ -54,6 +55,11 @@ namespace angular1
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddSwaggerGen(sw =>
+            {
+                sw.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger API", Version = "vertion 1" });
+            });
           
            
             services.AddControllersWithViews();
@@ -70,6 +76,11 @@ namespace angular1
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(sw =>
+                {
+                    sw.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+                });
             }
             else
             {
