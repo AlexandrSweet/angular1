@@ -17,5 +17,7 @@ namespace DataAccessLayer
         {
             return base.SaveChanges();
         }
+        public DbSet<ComputerManufacturer> ComputerManufacturers { get; set; }
+        public DbSet<ComputerModel> ComputerModels { get; set; }
     }
 }
